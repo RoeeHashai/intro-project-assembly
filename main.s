@@ -42,21 +42,9 @@ main:
     xorq %rax, %rax
     call scanf
 
-    // # Print the prompt
-    // movq $result_fmt, %rdi
-    // movq [seed], %rsi
-    // xorq %rax, %rax
-    // call printf
-
     // # Set the seeds for srand
     movq [seed], %rdi
     call srand
-
-    // # Print the prompt
-    // movq $result_fmt, %rdi
-    // movq %rax, %rsi
-    // xorq %rax, %rax
-    // call printf
 
     subq $16, %rsp
     call rand
@@ -69,18 +57,8 @@ main:
     idiv %rdi           # Divide rdx:rax by the divisor
     movq %rdx, (%rsp)   # Store the remainder back on the stack
 
-    // # Debug print
-    // movq $result_fmt, %rdi
-    // movq (%rsp), %rsi
-    // xorq %rax, %rax
-    // call printf
-
     # Initialize loop counter
     movb $0, %bl  # Counter register
-    movq $result_fmt, %rdi
-    movzb %bl, %rsi
-    xorq %rax, %rax
-    call printf
     subq $16, %rsp
 
 .loop:
@@ -102,11 +80,6 @@ main:
     cmpq %rax, %rsi         # Compare %rbx with %rax
     je .correct_guess
 
-    // # Debug print
-    movq $result_fmt, %rdi
-    movzb %bl, %rsi
-    xorq %rax, %rax
-    call printf
     # Increment loop counter
     incb %bl
 
