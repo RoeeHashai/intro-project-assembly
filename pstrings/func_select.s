@@ -5,17 +5,8 @@
 .extern pstrijcpy
 
 .section .rodata
-cmd_31_fmt:
-    .string "first pstring length: %d, second pstring length: %d\n"
-cmd_33_34_fmt:
-    .string "length: %d, string: %s\n"
 invalid_option_fmt:
     .string "invalid option!\n"
-invalid_input_fmt:
-    .string "invalid input!\n"
-cmd_34_read_fmt:
-    .string "%d %d"
-
 
 .section .text
 .globl run_func
@@ -38,10 +29,11 @@ run_func:
     call swapCase
     jmp .cleanup
 .cmd_34:
+    call pstrijcpy
     jmp .cleanup
 .cmd_invalid:
     # Print that input was invalid
-    movq $invalid_input_fmt, %rdi
+    movq $invalid_option_fmt, %rdi
     xorq %rax, %rax
     call printf
     jmp .cleanup
