@@ -27,14 +27,14 @@ gameover_msg:
 .type	main, @function
 
 main:
-    # Starting stack frame
-    pushq %rbp
+    # Function prologue - create a stack frame
+    pushq %rbp          
     movq %rsp, %rbp
 
     # Print the prompt
-    movq $user_configSeed_fmt, %rdi
-    xorq %rax, %rax
-    call printf
+    movq $user_configSeed_fmt, %rdi  # Load the format string for printf
+    xorq %rax, %rax                  # Clear the RAX register
+    call printf                      # Call the printf function with the provided format string
 
     # Read the seed input
     movq $scanf_fmt, %rdi
@@ -42,7 +42,7 @@ main:
     xorq %rax, %rax
     call scanf
 
-    // # Set the seeds for srand
+    # Set the seeds for srand
     movq [seed], %rdi
     call srand
 
@@ -107,10 +107,8 @@ main:
     call printf
 
 .done:
-    # Restore stack pointer
+    # Function epilogue - cleanup stack and exit
     movq %rbp, %rsp
-
-    # Exit program
-    xorq %rax, %rax
     popq %rbp
+    xorq %rax, %rax
     ret
