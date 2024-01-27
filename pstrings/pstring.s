@@ -225,7 +225,7 @@ pstrijcpy:
     // shrq $8, %rdx           # Shift right RDX to store the len of str2
 .check_i_j_valid:
     # Check that i and j are valid and in the range in order to contine
-    cmp %r8, %r9          # Compare i and j
+    cmp %r9, %r8            # Compare i and j
     jg .invalid_input       # if i > j jmp to invalid_input
     # Check the if i is valid
     cmp $0, %r8            
@@ -268,14 +268,14 @@ pstrijcpy:
     jmp .prefix_loop        # continue reading the suffix
 
 .cpyIUntilJ:
-    cmp %rax, %r9
+    cmp %r9, %rax
     jg .print_cpy_str       # if i > j => means that read the whole part to copy jmp to print the results
     movb (%rdx), %cl        # Load a byte(char) from RDX(str2) into the CL
     movb %cl, (%rsi)        # Store the byte(char) in CL to the destination address RSI
     incq %rax               # Increment couter loop of str1
     incq %rsi               # increment in order to read the next byte(char) in str1
     incq %rdx               # increment in order to read the next byte(char) in str2
- //   incq %rbx               # Increment couter loop of str2
+ //   incq %rbx             # Increment couter loop of str2
     jmp .cpyIUntilJ
 
 .invalid_input:
