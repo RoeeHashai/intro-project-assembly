@@ -17,50 +17,28 @@ pstrlen:
     pushq %rbp          
     movq %rsp, %rbp
 
-    # Restore a backup in memory of Addr of pstr1
+    # Restore a backup in memory of Addr of pstr
     subq $16, %rsp
     movq %rdi, (%rsp)
 
     # Move the byte(size of str) in to AL
-    xorq %rax, %rax
-    movb (%rdi), %al            # AL = length of str1
-    // movb (%rdx), %bl            # BL = length of str2
+    xorq %rax, %rax             # Cleanup RAX
+    movb (%rdi), %al            # AL = length of pstr
 
-    # clean up rsi and rdx
-    // xor %rsi, %rsi          
-    // xor %rdx, %rdx
-
-    # move str1 and str2 length to RSI, RDX as args to printf         
-    // movb %al, %sil              # SIL = length of str1
-    // movb %bl, %dl               # BL = length of str2
-
-    // # Print the lengths
-    // movq $pstrlen_fmt, %rdi # RDI = string literal 
-    // xorq %rax, %rax
-    // call printf
-
-    # Restore the addr of str1 and str2 and choice - Calle saved
-    // movq 8(%rsp), %rdi          # Restore the value of choice
-    movq (%rsp), %rdi         # Restore the value of addr str1
-    // movq 24(%rsp), %rdx         # Restore the value of addr str2
+    # Restore the addr of pstr - Calle saved
+    movq (%rsp), %rdi           # Restore the value of addr pstr
 
     # Function epilogue - cleanup stack and exit
-    movq %rbp, %rsp
-    popq %rbp
-    // xorq %rax, %rax
-    ret
+    movq %rbp, %rsp             # Return RSP to RBP
+    popq %rbp                   # Return RBP to the old RBP to close the memory frame
+    ret                         # Return the memory frame
 
 swapCase:
     # Function prologue - create a stack frame
     pushq %rbp          
     movq %rsp, %rbp
 
-    # Restore a backup in memory of Addr of pstr1 and pstr2
-    // subq $32, %rsp
-    // movq %rdx, 24(%rsp)
-    // movq %rsi, 16(%rsp)
-    // movq %rdi, 8(%rsp)
-    # Restore a backup in memory of Addr of pstr1
+    # Allocat
     subq $16, %rsp
     movq %rdi, (%rsp)
 
