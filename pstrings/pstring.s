@@ -38,88 +38,40 @@ swapCase:
     pushq %rbp          
     movq %rsp, %rbp
 
-    # Allocat
-    subq $16, %rsp
-    movq %rdi, (%rsp)
+    # Allocate memory to save the addr of RDI(pstr)
+    subq $16, %rsp              # Allocate memory on the stack for Addr of pstr
+    movq %rdi, (%rsp)           # Move RDI(addr pstr) to the allocated memory
 
-    # Increment str1, str2 to point on the first letter
-    // incq %rsi
-    // incq %rdx
-    incq %rdi
+    incq %rdi                   # Increment RDI to point to the next byte(the addr of the start of the string in the pstr struct)
 
-    # Init counters
-    xor %rax, %rax              # Set the RAX = counterLenStr1 = 0
-    // xor %rbx, %rbx              # Set the RBX = counterLenStr2 = 0
-
-# Loop throght str and switch uppper case to lower and lower to upper
+# Loop throght pstr and switch uppper case to lower and lower to upper
 .loop_case_str:
-    cmpb $0, (%rdi)             # If char == '\0' than check str2
+    cmpb $0, (%rdi)             # If char == '\0' than exit loop
     je .cleanup_swapcase
-    incq %rax                   # not the last char than increment counter length
     cmpb $65, (%rdi)            # compare if the char is not a letter, less than 'A'
-    jl .cleanup_swapcase          # if less than 'A' jump to check str2
+    jl .cleanup_swapcase        # if less than 'A' jump to check str
     cmpb $90, (%rdi)            # compare if char is in range 'A' - 'Z'
-    jle .swapCase           # if a capital letter than jump to switch from upper case to lower case
+    jle .swapCase               # if a capital letter than jump to switch from upper case to lower case
     cmpb $97, (%rdi)            # compare if the char is not a letter, less than 'a' but greater than 'Z'
-    jl .cleanup_swapcase          # if less than 'a' and greater than 'Z' jump to check str2
+    jl .cleanup_swapcase        # if less than 'a' and greater than 'Z' jump to check str
     cmpb $122, (%rdi)           # compare if char is in range 'a' - 'z'
-    jle .swapCase           # if a lower case letter than jump to switch from lower case to upper case
-    jmp .cleanup_swapcase         # jump to the next str
+    jle .swapCase               # if a lower case letter than jump to switch from lower case to upper case
+    jmp .cleanup_swapcase       # jump to the cleanup frame
+
+# In case that its a letter swap the case of the char
 .swapCase:
-    xorl $32, (%rdi)            # change case by using a mast and XORing with 32
-    incq %rdi                   # point to the next byte(char) in str1
-    jmp .loop_case_str
-
-// .loop_case_str2:
-//     cmpb $0, (%rdx)             # If char == '\0' than break the loop
-//     je .print_case_res
-//     incq %rbx                   # not the last char than increment counter length
-//     cmpb $65, (%rdx)            # compare if the char is not a letter, less than 'A'
-//     jl .print_case_res          # if less than 'A' jump to check str2
-//     cmpb $90, (%rdx)            # compare if char is in range 'A' - 'Z'
-//     jle .swapStr2Case           # if a capital letter than jump to switch from upper case to lower case
-//     cmpb $97, (%rdx)            # compare if the char is not a letter, less than 'a' but greater than 'Z'
-//     jl .print_case_res          # if less than 'a' and greater than 'Z' jump to check str2
-//     cmpb $122, (%rdx)           # compare if char is in range 'a' - 'z'
-//     jle .swapStr2Case           # if a lower case letter than jump to switch from lower case to upper case
-//     jmp .print_case_res         # jump to the next str
-
-// .swapStr2Case:
-//     xorl $32, (%rdx)            # change case by using a mast and XORing with 32
-//     incq %rdx                   # point to the next byte(char) in str1
-//     jmp .loop_case_str2
+    xorl $32, (%rdi)            # change case by using a mask and XORing with 32
+    incq %rdi                   # point to the next byte(char) in pstr
+    jmp .loop_case_str          # Go back to loop and cotinue changing the all of the letters case
 
 .cleanup_swapcase:
-    # Restore the addr of str1
-    // movq 16(%rsp), %rdx         # RDX = adrr str1
-    movq (%rsp), %rax         # RDX = adrr str1
-    movq (%rsp), %rdi         # RDX = adrr str1
-
-    // # Print the changed strings and there lengths
-    // movq $swapcase_ij_fmt, %rdi    # RDI = string literal 
-    // movq %rax, %rsi             # RSI = counter_str1
-    // xorq %rax, %rax
-    // call printf
-
-    // # Restore the addr of str2
-    // movq 24(%rsp), %rdx         # RDX = adrr str2
-
-    // # Print the changed strings and there lengths
-    // movq $swapcase_ij_fmt, %rdi # RDI = string literal 
-    // movq %rbx, %rsi             # RSI = counter_str2
-    // xorq %rax, %rax
-    // call printf
-
-    // # Restore the addr of str1 and str2 and choice
-    // movq 8(%rsp), %rdi          # Restore the value of choise
-    // movq 16(%rsp), %rsi         # Restore the value of addr str1
-    // movq 24(%rsp), %rdx         # Restore the value of addr str2
+    # Restore the addr of pstr
+    movq (%rsp), %rax           # RAX = adrr pstr - return this value to the caller
 
     # Function epilogue - cleanup stack and exit
-    movq %rbp, %rsp
-    popq %rbp
-    // xorq %rax, %rax
-    ret
+    movq %rbp, %rsp             # Return RSP to RBP
+    popq %rbp                   # Return RBP to the old RBP to close the memory frame
+    ret                         # Return the memory frame
 
 pstrijcpy:
     # Function prologue - create a stack frame
@@ -130,35 +82,17 @@ pstrijcpy:
     subq $32, %rsp
     movq %rsi, 24(%rsp)
     movq %rdi, 16(%rsp)
-    // movq %rdi, 8(%rsp)
 
-    // # Read i and j from user
-    // movq $read_i_j_fmt, %rdi
-    // leaq 4(%rsp), %rsi
-    // movq %rsp, %rdx
-    // xorq %rax, %rax
-    // call scanf
-
-    // # Clean up r8 and r9 to hold i and j
-    // xorq %r8, %r8
-    // xorq %r9, %r9
-
-    // # move i and j to register that need to hold adrd for the length function
-    // movl 4(%rsp), %r8d          # R8 = i
-    // movl (%rsp), %r9d           # R9 = j
-
-    # Reset RAX(count_len_str1), RBX(count_len_str2) to 0
-    xorq %rax, %rax             # RAX(countlenstr1) = 0
-    xorq %rbx, %rbx             # RBX(countlenstr2) = 0
-
-    # Restore the addr of str1 and str2 and choice
-    // movq 16(%rsp), %rsi         # Restore the value of addr str1
-    // movq 24(%rsp), %rdx         # Restore the value of addr str2
+    # Cleanup RAX, and RBX
+    xorq %rax, %rax             # RAX(lenstr1) = 0
+    xorq %rbx, %rbx             # RBX(lenstr2) = 0
 
     # Move the byte(size of str1 and str2) in to AL, BL
     movb (%rdi), %al            # AL = length of str1
     movb (%rsi), %bl            # BL = length of str2
 
+# CL = j, DL = i
+# Check if the i and j are valid
 .check_i_j_valid:
     # Check that i and j are valid and in the range in order to continue
     cmp %cl, %dl                # Compare i and j
@@ -180,76 +114,71 @@ pstrijcpy:
     cmp %bl, %cl
     jg .invalid_input           # if j > len(str2) jmp to invalid_input
 
-    xorq %r14, %r14
-    xorq %r15, %r15
-    mov %al, %r14b            # R14 = len str1
-    mov %bl, %r15b            # R15 = len str2
+    # Backup lenghts of pst1 and 2 to R14, R15
+    xorq %r14, %r14             # Cleanup R14
+    xorq %r15, %r15             # Cleanup R15
+    mov %al, %r14b              # R14 = len str1
+    mov %bl, %r15b              # R15 = len str2
 
     # Reset RAX, RBX to 0
     xorq %rax, %rax             # RAX = counterLoopStr1
 
-    // # Restore the addr of str1 and str2
-    // movq 16(%rsp), %rsi         # Restore the value of addr str1
-    // movq 24(%rsp), %rdx         # Restore the value of addr str2
-
-    # Increment str1, str2 to point on the first letter
-    incq %rdi       # str1
-    incq %rsi       # str2
-    xorq %r8, %r8
+    # Increment pstr1, pstr2 to point on the first letter
+    incq %rdi                   # RDI = addr str1
+    incq %rsi                   # RSI = addr str2
+    xorq %r8, %r8               # Cleanup R8  
 
 .prefix_loop:
-    cmpb $0, (%rdi)             # If char == '\0' than check str2
+    cmpb $0, (%rdi)             # if char == '\0' than jump to cleanup code to exit
     je .cleanup
-    cmp %al, %dl              # if pointing on the i-th index jump to the copy lable to copy the string
+    cmp %al, %dl                # if pointing on the i-th index jump to the copy lable to copy the string
     je .cpyIUntilJ              # jump to the copy part to copy from i to j
     incq %rax                   # if not equal - increment lenStr1
-    incq %rdi                   # increment in order to read the next byte(char)
-    jmp .prefix_loop            # continue reading the suffix
+    incq %rdi                   # increment RDI in order to read the next byte(char)
+    jmp .prefix_loop            # continue reading the prefix
 
 .cpyIUntilJ:
-    cmp %cl, %al
+    cmp %cl, %al                # compare the counter of the loop to j - ig than stop and exit
     jg .print_cpy_str           # if i > j => means that read the whole part to copy jmp to print the results
-    movb (%rsi), %r8b            # Load a byte(char) from RDX(str2) into the CL
-    movb %r8b, (%rdi)            # Store the byte(char) in CL to the destination address RSI
-    incq %rax                   # Increment couter loop of str1
+    movb (%rsi), %r8b           # Load a byte(char) from RSI(addr pstr2) into the R8B(temp)
+    movb %r8b, (%rdi)           # Store the byte(char) in R8B to the destination address RDI
+    incq %rax                   # Increment counter loop of str1
     incq %rdi                   # increment in order to read the next byte(char) in str1
     incq %rsi                   # increment in order to read the next byte(char) in str2
     jmp .cpyIUntilJ
 
 .invalid_input:
     # Print that the input was invalid and exit the program
-    movq $invalid_input_fmt, %rdi 
-    xorq %rax, %rax
-    call printf
-    jmp .cleanup
+    movq $invalid_input_fmt, %rdi   # Move invalid input format to RDI to print it
+    xorq %rax, %rax             # Cleanup RAX
+    call printf                 # Call printf
+    jmp .cleanup                # Go to cleanup code and cleanup stack frame
 
 .print_cpy_str:
     # Restore the addr of str1
-    movq 16(%rsp), %rdx         # Restore the value of addr str1
+    movq 16(%rsp), %rdx         # Restore the value of addr pstr1 it need to be returned
 
     # Print the destination copied string
-    movq $swapcase_ij_fmt, %rdi 
-    movq %r14, %rsi
-    xorq %rax, %rax
-    call printf
+    movq $swapcase_ij_fmt, %rdi # Move printing format to RDI to print it
+    movq %r14, %rsi             # Move the len of pstr1 to RSI
+    xorq %rax, %rax             # Cleanup RAX
+    call printf                 # Call printf
 
-    movq 24(%rsp), %rdx         # Restore the value of addr str2
+    movq 24(%rsp), %rdx         # Restore the value of addr pstr2
+
     # Print the source string
-    movq $swapcase_ij_fmt, %rdi 
-    movq %r15, %rsi
-    xorq %rax, %rax
-    call printf
-    jmp .cleanup
+    movq $swapcase_ij_fmt, %rdi # Move printing format to RDI to print it
+    movq %r15, %rsi             # Move the len of pstr2 to RSI
+    xorq %rax, %rax             # Cleanup RAX
+    call printf                 # Call printf
+    jmp .cleanup                # Go to cleanup to exit frame correctly
 
 .cleanup:
-    # Restore the addr of str1 and str2 and choice
-    // movq 8(%rsp), %rdi          # Restore the value of choise
+    # Restore the addr of pstr1 and pstr2 and choice back to rdi and rsi - calle saved
     movq 16(%rsp), %rdi         # Restore the value of addr str1
     movq 24(%rsp), %rsi         # Restore the value of addr str2
 
     # Function epilogue - cleanup stack and exit
-    movq %rbp, %rsp
-    popq %rbp
-    // xorq %rax, %rax
-    ret
-    
+    movq %rbp, %rsp             # Return RSP to RBP
+    popq %rbp                   # Return RBP to the old RBP to close the memory frame
+    ret                         # Return the memory frame
