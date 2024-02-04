@@ -83,7 +83,7 @@ run_func:
     # Read i and j from user
     movq $read_i_j_fmt, %rdi
     leaq 4(%rsp), %rsi      # Load the addr of rsp+4 (i) to RSI
-    movq %rsp, %rdx         # Move RSP to RDX
+    movq %rsp, %rdx         # Move RSP to RDX the addr of j
     xorq %rax, %rax         # Cleanup RAX
     call scanf              # Call scanf to read i and j
 
@@ -91,9 +91,9 @@ run_func:
     xorq %rdx, %rdx         # Cleanup RDX
     xorq %rcx, %rcx         # Cleanup RCX
 
-    # Prepare the the arguments fro the pstijcpy
-    movl 4(%rsp), %edx      # EDX  = i
-    movl (%rsp), %ecx       # ECX = j
+    # Prepare the the arguments for the pstijcpy
+    movb 4(%rsp), %dl       # EDX  = i
+    movb (%rsp), %cl        # ECX = j
     movq 16(%rsp), %rdi     # RDI = addr of pstr1
     movq 24(%rsp), %rsi     # RSI = addr of pstr2
     call pstrijcpy          # Call pstrijcpy
