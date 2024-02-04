@@ -83,7 +83,7 @@ run_func:
     # Read i and j from user
     movq $read_i_j_fmt, %rdi
     leaq 4(%rsp), %rsi      # Load the addr of rsp+4 (i) to RSI
-    movq %rsp, %rdx         # Move RSP to RDX the addr of j
+    movq %rsp, %rdx         # Move RSP to RDX the addr of j to RDX
     xorq %rax, %rax         # Cleanup RAX
     call scanf              # Call scanf to read i and j
 
