@@ -1,3 +1,4 @@
+/* 209853282 Roee Hashai */
 .extern printf
 .extern scanf
 .extern pstrlen
@@ -16,6 +17,7 @@ read_i_j_fmt:
 
 .section .text
 .globl run_func
+.type run_func, @function
 run_func:
     # Function prologue - create a stack frame
     pushq %rbp          
@@ -64,6 +66,7 @@ run_func:
     xorq %rsi, %rsi         # Cleanup RSI
     movb %r8b, %sil         # Move the len of pstlen1 to SIL
     movq %rax, %rdx         # Move the addr return from rax(pst1 after swapping cases) to RDX
+    addq $1, %rdx           # Change the adde to the start of the str
     call printf             # Call printf
 
     movq 24(%rsp), %rdi     # Move from memory addr of pstr2 to RDI
@@ -76,6 +79,7 @@ run_func:
     xorq %rsi, %rsi         # Cleanup RSI    
     movb %r8b, %sil         # Move the len of pstlen2 to SIL
     movq %rax, %rdx         # Move the addr return from rax(pst2 after swapping cases) to RDX
+    addq $1, %rdx         # Change the adde to the start of the str
     call printf             # Call printf
     jmp .cleanup            # goto cleanup code exit the function
 

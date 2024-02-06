@@ -1,3 +1,4 @@
+/* 209853282 Roee Hashai */
 .extern printf
 .extern scanf
 .extern srand
@@ -26,7 +27,7 @@ incorrectString:
 
 .section .text
 .globl main
-.type	main, @function
+.type   main, @function
 
 main:
     # Function prologue - create a new stack frame
@@ -45,7 +46,7 @@ main:
     call scanf
 
     # Set the seeds for srand
-    movq [seed], %rdi                   # Move the value of seed to rdi prepare for the srand function
+    movq seed, %rdi                   # Move the value of seed to rdi prepare for the srand function
     call srand
 
     subq $16, %rsp                      # Allocate memory for the value guess value to the 

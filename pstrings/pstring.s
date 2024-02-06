@@ -1,3 +1,4 @@
+/* 209853282 Roee Hashai */
 .extern printf
 .extern scanf
 .section .rodata
@@ -11,7 +12,9 @@ invalid_input_fmt:
     .string "invalid input!\n"
 
 .section .text
-.globl pstrlen, swapCase,  pstrijcpy
+.globl pstrlen
+.type pstrlen, @function
+
 pstrlen:
     # Function prologue - create a stack frame
     pushq %rbp          
@@ -33,6 +36,8 @@ pstrlen:
     popq %rbp                   # Return RBP to the old RBP to close the memory frame
     ret                         # Return the memory frame
 
+.globl swapCase
+.type swapCase, @function
 swapCase:
     # Function prologue - create a stack frame
     pushq %rbp          
@@ -46,6 +51,7 @@ swapCase:
 
 # Loop throght pstr and switch uppper case to lower and lower to upper
 .loop_case_str:
+    incq %rdi                   # Increment RDI to point to the next byte
     cmpb $0, (%rdi)             # If char == '\0' than exit loop
     je .cleanup_swapcase
     cmpb $65, (%rdi)            # compare if the char is not a letter, less than 'A'
@@ -73,6 +79,8 @@ swapCase:
     popq %rbp                   # Return RBP to the old RBP to close the memory frame
     ret                         # Return the memory frame
 
+.globl pstrijcpy
+.type pstrijcpy, @function
 pstrijcpy:
     # Function prologue - create a stack frame
     pushq %rbp          
@@ -148,7 +156,7 @@ pstrijcpy:
 
 .cpyIUntilJ:
     cmp %cl, %al                # compare the counter of the loop to j - i than stop and exit
-    jg .print_cpy_str           # if i > j => means that read the whole part to copy jmp to print the results
+    jg .print_final_str         # if i > j => means that read the whole part to copy jmp to print the results
     movb (%rsi), %r8b           # Load a byte(char) from RSI(addr pstr2) into the R8B(temp)
     movb %r8b, (%rdi)           # Store the byte(char) in R8B to the destination address RDI
     incq %rax                   # Increment counter loop
@@ -157,13 +165,20 @@ pstrijcpy:
     jmp .cpyIUntilJ
 
 .invalid_input:
+    # Backup lenghts of pst1 and 2 to R14, R15
+    xorq %r14, %r14             # Cleanup R14
+    xorq %r15, %r15             # Cleanup R15
+    mov %al, %r14b              # R14 = len str1
+    mov %bl, %r15b              # R15 = len str2
+    addb $1, %r15b              # Retrive the length str2
+    addb $1, %r14b              # Retrive the length str1
     # Print that the input was invalid and exit the program
     movq $invalid_input_fmt, %rdi   # Move invalid input format to RDI to print it
     xorq %rax, %rax             # Cleanup RAX
     call printf                 # Call printf
-    jmp .cleanup                # Go to cleanup code and cleanup stack frame
+    jmp .print_final_str        # Go to print the output without changes
 
-.print_cpy_str:
+.print_final_str:
     # Restore the addr of str1
     movq 16(%rsp), %rdx         # Restore the value of addr pstr1 it need to be returned
     addq $1, %rdx               # Add one byte to the addr for the string startin addr
