@@ -130,8 +130,6 @@ pstrijcpy:
 
     # Reset RAX, RBX to 0
     xorq %rax, %rax             # RAX = conter of the loop
-    // xorq %rbx, %rbx             # RBX = counter for j
-
 
     # Increment pstr1, pstr2 to point on the first letter
     incq %rdi                   # RDI = addr str1
@@ -144,7 +142,6 @@ pstrijcpy:
     cmp %al, %dl                # if pointing on the i-th index jump to the copy lable to copy the string
     je .cpyIUntilJ              # jump to the copy part to copy from i to j
     incq %rax                   # if not equal - increment counter of loop
-    // incq %r
     incq %rdi                   # increment RDI(pstr1) in order to read the next byte(char)
     incq %rsi                   # increment RSI(pstr2) in order to read the next byte(char)
     jmp .prefix_loop            # continue reading the prefix
@@ -169,7 +166,8 @@ pstrijcpy:
 .print_cpy_str:
     # Restore the addr of str1
     movq 16(%rsp), %rdx         # Restore the value of addr pstr1 it need to be returned
-    addq $1, %rdx
+    addq $1, %rdx               # Add one byte to the addr for the string startin addr
+
     # Print the destination copied string
     movq $swapcase_ij_fmt, %rdi # Move printing format to RDI to print it
     movq %r14, %rsi             # Move the len of pstr1 to RSI
@@ -177,7 +175,7 @@ pstrijcpy:
     call printf                 # Call printf
 
     movq 24(%rsp), %rdx         # Restore the value of addr pstr2
-    addq $1, %rdx
+    addq $1, %rdx               # Add one byte to the addr for the string startin addr
 
     # Print the source string
     movq $swapcase_ij_fmt, %rdi # Move printing format to RDI to print it
