@@ -51,18 +51,21 @@ swapCase:
 
 # Loop throght pstr and switch uppper case to lower and lower to upper
 .loop_case_str:
-    incq %rdi                   # Increment RDI to point to the next byte
     cmpb $0, (%rdi)             # If char == '\0' than exit loop
     je .cleanup_swapcase
     cmpb $65, (%rdi)            # compare if the char is not a letter, less than 'A'
-    jl .cleanup_swapcase        # if less than 'A' jump to check str
+    jl .next_char               # if less than 'A' jump to check next char
     cmpb $90, (%rdi)            # compare if char is in range 'A' - 'Z'
     jle .swapCase               # if a capital letter than jump to switch from upper case to lower case
     cmpb $97, (%rdi)            # compare if the char is not a letter, less than 'a' but greater than 'Z'
-    jl .cleanup_swapcase        # if less than 'a' and greater than 'Z' jump to check str
+    jl .next_char        # if less than 'a' and greater than 'Z' jump to check str
     cmpb $122, (%rdi)           # compare if char is in range 'a' - 'z'
     jle .swapCase               # if a lower case letter than jump to switch from lower case to upper case
     jmp .cleanup_swapcase       # jump to the cleanup frame
+
+.next_char:
+    incq %rdi                   # Move to next char
+    jmp .loop_case_str           # Contiue the loop
 
 # In case that its a letter swap the case of the char
 .swapCase:
