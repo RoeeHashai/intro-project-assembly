@@ -91,10 +91,6 @@ pstrijcpy:
     movb (%rdi), %al            # AL = length of str1
     movb (%rsi), %bl            # BL = length of str2
 
-    # Sub -1 from the length to meet the indices
-    subb $1, %al                # AL = len pstr1 - 1
-    subb $1, %bl                # BL = len pstr2 - 1
-
 # CL = j, DL = i
 # Check if the i and j are valid
 .check_i_j_valid:
@@ -118,10 +114,6 @@ pstrijcpy:
     cmp %bl, %cl
     jg .invalid_input           # if j > len(str2) jmp to invalid_input
 
-    # Add 1 to meet the lengths size
-    addb $1, %al                # AL = len pstr1 + 1
-    addb $1, %bl                # BL = len pstr2 + 1
-
     # Backup lenghts of pst1 and 2 to R14, R15
     xorq %r14, %r14             # Cleanup R14
     xorq %r15, %r15             # Cleanup R15
@@ -129,9 +121,7 @@ pstrijcpy:
     mov %bl, %r15b              # R15 = len str2
 
     # Reset RAX, RBX to 0
-    xorq %rax, %rax             # RAX = conter of the loop
-    // xorq %rbx, %rbx             # RBX = counter for j
-
+    xorq %rax, %rax             # RAX = counterLoopStr1
 
     # Increment pstr1, pstr2 to point on the first letter
     incq %rdi                   # RDI = addr str1
@@ -143,20 +133,18 @@ pstrijcpy:
     je .cleanup
     cmp %al, %dl                # if pointing on the i-th index jump to the copy lable to copy the string
     je .cpyIUntilJ              # jump to the copy part to copy from i to j
-    incq %rax                   # if not equal - increment counter of loop
-    // incq %r
-    incq %rdi                   # increment RDI(pstr1) in order to read the next byte(char)
-    incq %rsi                   # increment RSI(pstr2) in order to read the next byte(char)
+    incq %rax                   # if not equal - increment lenStr1
+    incq %rdi                   # increment RDI in order to read the next byte(char)
     jmp .prefix_loop            # continue reading the prefix
 
 .cpyIUntilJ:
-    cmp %cl, %al                # compare the counter of the loop to j - i than stop and exit
+    cmp %cl, %al                # compare the counter of the loop to j - ig than stop and exit
     jg .print_cpy_str           # if i > j => means that read the whole part to copy jmp to print the results
     movb (%rsi), %r8b           # Load a byte(char) from RSI(addr pstr2) into the R8B(temp)
     movb %r8b, (%rdi)           # Store the byte(char) in R8B to the destination address RDI
-    incq %rax                   # Increment counter loop
-    incq %rdi                   # increment RDI(pstr1) in order to read the next byte(char)
-    incq %rsi                   # increment RSI(pstr2) in order to read the next byte(char)
+    incq %rax                   # Increment counter loop of str1
+    incq %rdi                   # increment in order to read the next byte(char) in str1
+    incq %rsi                   # increment in order to read the next byte(char) in str2
     jmp .cpyIUntilJ
 
 .invalid_input:
@@ -169,7 +157,7 @@ pstrijcpy:
 .print_cpy_str:
     # Restore the addr of str1
     movq 16(%rsp), %rdx         # Restore the value of addr pstr1 it need to be returned
-    addq $1, %rdx
+
     # Print the destination copied string
     movq $swapcase_ij_fmt, %rdi # Move printing format to RDI to print it
     movq %r14, %rsi             # Move the len of pstr1 to RSI
@@ -177,7 +165,6 @@ pstrijcpy:
     call printf                 # Call printf
 
     movq 24(%rsp), %rdx         # Restore the value of addr pstr2
-    addq $1, %rdx
 
     # Print the source string
     movq $swapcase_ij_fmt, %rdi # Move printing format to RDI to print it

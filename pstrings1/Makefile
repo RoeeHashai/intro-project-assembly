@@ -4,7 +4,7 @@ MAIN = pstrings
 
 .PHONY: all clean
 
-all: pstrings
+all: $(MAIN)
 
 $(MAIN): main.o func_select.o pstring.o
 	$(CC) $(CFLAGS) $^ -o $@ -no-pie

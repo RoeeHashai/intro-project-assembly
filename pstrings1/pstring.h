@@ -2,7 +2,7 @@
 #define PSTRING_H
 
 typedef struct {
-	unsigned char len;
+	char len;
 	char str[255];
 } Pstring;
 

@@ -16,11 +16,13 @@ scanf_fmt:
 user_guess_fmt:
     .string "What is your guess? "
 result_fmt:
-    .string "%d.\n"
+    .string "%d\n"
 win_msg:
     .string "Congratz! You won!\n"
 gameover_msg:
-    .string "Game over, you lost :(. The Correct answer was "
+    .string "Game over, you lost :(. The correct answer was "
+incorrectString:
+    .string "Incorrect.\n"
 
 .section .text
 .globl main
@@ -74,12 +76,17 @@ main:
     call scanf                          # Call scanf
 
     # Load values from memory into registers
-    movq (%rsp), %rax                   # Load value at the top of the stack into %rax
+    movq (%rsp), %rcx                   # Load value at the top of the stack into %rcx
     movq 16(%rsp), %rsi                 # Load value at offset 16 from the stack into %rbx
 
     # Compare the values in registers
-    cmpq %rax, %rsi                     # Compare %rbx with %rax
+    cmpq %rcx, %rsi                     # Compare %rsi with %rcx
     je .correct_guess                   # Jump to corrcet guess if the user guess correct
+
+    # Print the incorrect message
+    movq $incorrectString, %rdi         # Move the incorrect format to RDI
+    xorq %rax, %rax                     # Cleanup RAX
+    call printf                         # Call printf
 
     # Increment loop counter
     incb %bl                            # BL = counter of the loop for maximun gusses
